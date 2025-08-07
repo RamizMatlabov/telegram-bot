@@ -8,7 +8,7 @@ class BotConfig:
 
 # Get your token from environment variable or put it directly
 BOT_TOKEN = os.getenv('BOT_TOKEN', '8207927039:AAFbPl7ZbihfZSJjV2lG3csQ_M7FTna_0Yg')
-ADMIN_ID = int(os.getenv('ADMIN_ID', '123456789'))  # Replace with your Telegram ID
+ADMIN_ID = int(os.getenv('ADMIN_ID', '6856017270'))  # Replace with your Telegram ID
 
 config = BotConfig(
     token=BOT_TOKEN,
