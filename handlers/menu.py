@@ -101,6 +101,16 @@ async def go_back(callback: CallbackQuery):
     )
     await callback.answer()
 
+
+# Обработчик для кнопки "My Cart"
+@router.callback_query(lambda c: c.data == "cart")
+async def show_cart(callback: CallbackQuery):
+    await callback.message.edit_text(
+        "🛒 <b>Your cart is empty</b>\n\nAdd items from the menu",
+        reply_markup=get_back_keyboard()
+    )
+    await callback.answer()
+
 def get_back_keyboard():
     from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
     
