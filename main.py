@@ -478,16 +478,24 @@ async def handle_url_in_text(message: Message):
 
 
 
+
 # ==================== ERROR HANDLER ====================
 
-@dp.errors()
+@dp.error()
 async def errors_handler(update, exception):
     """Handle errors gracefully"""
     print(f"Error occurred: {exception}")
-    try:
-        await update.message.answer("❌ **An error occurred.** Please try again or use /start to reset.")
-    except:
-        pass
+    # Try to send error message to user if possible
+    message = None
+    if hasattr(update, 'message') and update.message:
+        message = update.message
+    elif hasattr(update, 'callback_query') and update.callback_query:
+        message = update.callback_query.message
+    if message:
+        try:
+            await message.answer("❌ **An error occurred.** Please try again or use /start to reset.", parse_mode="Markdown")
+        except Exception:
+            pass
 
 # ==================== MAIN FUNCTION ====================
 
