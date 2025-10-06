@@ -12,6 +12,7 @@ from aiohttp import web
 from handlers.start import router as start_router
 from handlers.menu import router as menu_router
 from handlers.admin import router as admin_router
+from handlers.cart import router as cart_router
 from config import config
 
 # Configure logging
@@ -63,6 +64,7 @@ async def main():
     dp.include_router(start_router)
     dp.include_router(menu_router)
     dp.include_router(admin_router)
+    dp.include_router(cart_router)
 
     # Регистрируем обработчики запуска и остановки
     dp.startup.register(on_startup)

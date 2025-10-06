@@ -1,17 +1,52 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
 def get_main_keyboard():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="🍽️ Menu", callback_data="menu"),
-            InlineKeyboardButton(text="🛒 My Cart", callback_data="cart")
+            InlineKeyboardButton(text="💧 Каталог воды", callback_data="catalog"),
+            InlineKeyboardButton(text="🛒 Моя корзина", callback_data="cart")
         ],
         [
-            InlineKeyboardButton(text="📞 Contact", callback_data="contact"),
-            InlineKeyboardButton(text="📍 Location", callback_data="location")
+            InlineKeyboardButton(text="🚚 Доставка", callback_data="delivery"),
+            InlineKeyboardButton(text="💰 Цены", callback_data="prices")
         ],
         [
-            InlineKeyboardButton(text="⏰ Hours", callback_data="hours")
+            InlineKeyboardButton(text="📞 Контакты", callback_data="contact"),
+            InlineKeyboardButton(text="❓ О нас", callback_data="about")
+        ]
+    ])
+    return keyboard
+
+def get_catalog_keyboard():
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🧊 Питьевая вода 5л", callback_data="water_5l")
+        ],
+        [
+            InlineKeyboardButton(text="🧊 Питьевая вода 10л", callback_data="water_10l")
+        ],
+        [
+            InlineKeyboardButton(text="🧊 Питьевая вода 19л", callback_data="water_19l")
+        ],
+        [
+            InlineKeyboardButton(text="🔄 Оборудование", callback_data="equipment")
+        ],
+        [
+            InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_main")
+        ]
+    ])
+    return keyboard
+
+def get_cart_keyboard():
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Оформить заказ", callback_data="checkout")
+        ],
+        [
+            InlineKeyboardButton(text="🗑️ Очистить корзину", callback_data="clear_cart")
+        ],
+        [
+            InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_main")
         ]
     ])
     return keyboard
