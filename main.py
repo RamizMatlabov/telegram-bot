@@ -24,9 +24,24 @@ WEBHOOK_URL = os.getenv('WEBHOOK_URL', '')
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH', '/webhook')
 APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
 APP_PORT = int(os.getenv('PORT', 8080))
+DELETE_WEBHOOK_ON_STARTUP = os.getenv('DELETE_WEBHOOK_ON_STARTUP', 'False').lower() == 'true'
+
+async def delete_webhook(bot: Bot) -> None:
+    """Принудительное удаление вебхука"""
+    try:
+        logger.info("Deleting webhook...")
+        await bot.delete_webhook()
+        logger.info("Webhook deleted successfully")
+    except Exception as e:
+        logger.error(f"Error deleting webhook: {e}")
 
 async def on_startup(bot: Bot) -> None:
     """Настройка вебхука при запуске"""
+    # Сначала удаляем вебхук, если это требуется
+    if DELETE_WEBHOOK_ON_STARTUP:
+        await delete_webhook(bot)
+    
+    # Затем устанавливаем новый вебхук, если нужно
     if WEBHOOK_MODE and WEBHOOK_URL:
         await bot.set_webhook(url=WEBHOOK_URL + WEBHOOK_PATH)
         logger.info(f"Webhook set to {WEBHOOK_URL + WEBHOOK_PATH}")
