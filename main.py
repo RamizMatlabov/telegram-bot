@@ -24,7 +24,7 @@ WEBHOOK_MODE = os.getenv('WEBHOOK_MODE', 'False').lower() == 'true'
 WEBHOOK_URL = os.getenv('WEBHOOK_URL', '')
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH', '/webhook')
 APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
-APP_PORT = int(os.getenv('PORT', 8080))
+APP_PORT = int(os.getenv('PORT', 10000))  # Render.com expects port 10000 by default
 DELETE_WEBHOOK_ON_STARTUP = os.getenv('DELETE_WEBHOOK_ON_STARTUP', 'False').lower() == 'true'
 
 async def delete_webhook(bot: Bot) -> None:
@@ -88,6 +88,11 @@ async def main():
         # Запуск веб-сервера
         logger.info(f"Starting webhook on {APP_HOST}:{APP_PORT}")
         try:
+            # Add a simple health check route that Render can use to detect the port
+            async def health_check(request):
+                return web.Response(text="Bot is running!")
+            
+            app.router.add_get("/", health_check)
             web.run_app(app, host=APP_HOST, port=APP_PORT)
         except Exception as e:
             logger.error(f"Error starting webhook: {e}")
