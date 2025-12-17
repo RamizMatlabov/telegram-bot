@@ -167,9 +167,9 @@ async def process_address(message: Message, state: FSMContext):
             item_total = product_price * quantity
             total += item_total
             
-            order_text += f"• {product_name} x {quantity} = {item_total} ₽\n"
+            order_text += f"• {product_name} x {quantity} = {item_total}\n"
         
-        order_text += f"\n<b>Итого:</b> {total} ₽"
+        order_text += f"\n<b>Итого:</b> {total}"
         
         await message.answer(
             order_text,
