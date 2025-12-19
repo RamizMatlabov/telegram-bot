@@ -37,16 +37,17 @@ def get_catalog_keyboard():
     ])
     return keyboard
 
-def get_cart_keyboard():
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="✅ Оформить заказ", callback_data="checkout")
-        ],
-        [
-            InlineKeyboardButton(text="🗑️ Очистить корзину", callback_data="clear_cart")
-        ],
-        [
-            InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_main")
-        ]
-    ])
-    return keyboard
+def get_cart_keyboard(show_actions: bool = True):
+    inline_keyboard = []
+
+    if show_actions:
+        inline_keyboard.extend(
+            [
+                [InlineKeyboardButton(text="✅ Оформить заказ", callback_data="checkout")],
+                [InlineKeyboardButton(text="🗑️ Очистить корзину", callback_data="clear_cart")],
+            ]
+        )
+
+    inline_keyboard.append([InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_main")])
+
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

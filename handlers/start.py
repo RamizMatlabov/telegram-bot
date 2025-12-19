@@ -34,7 +34,7 @@ async def show_cart(callback: CallbackQuery):
     await callback.message.edit_text(
         "🛒 Ваша корзина\n\n"
         "Корзина пуста. Добавьте товары из каталога.",
-        reply_markup=get_cart_keyboard()
+        reply_markup=get_cart_keyboard(show_actions=False)
     )
     await callback.answer()
 
