@@ -27,6 +27,15 @@ APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
 APP_PORT = int(os.getenv('PORT', 10000))  # Render.com expects port 10000 by default
 DELETE_WEBHOOK_ON_STARTUP = os.getenv('DELETE_WEBHOOK_ON_STARTUP', 'False').lower() == 'true'
 
+def get_webhook_base_url() -> str:
+    webhook_url = (WEBHOOK_URL or "").strip()
+    if webhook_url:
+        return webhook_url.rstrip("/")
+    render_external_url = (os.getenv("RENDER_EXTERNAL_URL", "") or "").strip()
+    if render_external_url:
+        return render_external_url.rstrip("/")
+    return ""
+
 async def delete_webhook(bot: Bot) -> None:
     """Принудительное удаление вебхука"""
     try:
@@ -43,9 +52,11 @@ async def on_startup(bot: Bot) -> None:
         await delete_webhook(bot)
     
     # Затем устанавливаем новый вебхук, если нужно
-    if WEBHOOK_MODE and WEBHOOK_URL:
-        await bot.set_webhook(url=WEBHOOK_URL + WEBHOOK_PATH)
-        logger.info(f"Webhook set to {WEBHOOK_URL + WEBHOOK_PATH}")
+    webhook_base_url = get_webhook_base_url()
+    if WEBHOOK_MODE and webhook_base_url:
+        webhook_full_url = f"{webhook_base_url}{WEBHOOK_PATH}"
+        await bot.set_webhook(url=webhook_full_url)
+        logger.info(f"Webhook set to {webhook_full_url}")
 
 async def on_shutdown(bot: Bot) -> None:
     """Удаление вебхука при остановке"""

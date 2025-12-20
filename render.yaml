@@ -11,15 +11,5 @@ services:
         sync: false
       - key: WEBHOOK_MODE
         value: true
-      - key: WEBHOOK_URL
-        fromService:
-          name: mypurewaterbot
-          type: web
-          property: url
       - key: WEBHOOK_PATH
         value: /webhook
-      - key: PORT
-        fromService:
-          name: mypurewaterbot
-          type: web
-          property: port
