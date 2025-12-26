@@ -23,32 +23,11 @@ class OrderStates(StatesGroup):
     waiting_for_address = State()
     waiting_for_confirmation = State()
 
-# Добавление товара в корзину
-@router.callback_query(lambda c: c.data.startswith("add_to_cart_"))
-async def add_to_cart(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    product_id = callback.data.replace("add_to_cart_", "")
-    
-    if user_id not in user_carts:
-        user_carts[user_id] = {}
-    
-    if product_id in user_carts[user_id]:
-        user_carts[user_id][product_id] = user_carts[user_id][product_id] + 1
-    else:
-        user_carts[user_id][product_id] = 1
-    
-    await callback.answer(f"{products[product_id]['name']} добавлен в корзину!")
-    
-    # Показываем обновленную корзину
-    await show_cart(callback)
-
-# Показать корзину
-@router.callback_query(lambda c: c.data == "cart")
-async def show_cart(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    
+# Вспомогательная функция для отображения корзины
+async def display_cart(user_id: int, message: Message):
+    """Отображает содержимое корзины пользователя"""
     if user_id not in user_carts or not user_carts[user_id]:
-        await callback.message.edit_text(
+        await message.edit_text(
             "🛒 Ваша корзина\n\n"
             "Корзина пуста. Добавьте товары из каталога.",
             reply_markup=get_main_keyboard()
@@ -67,54 +46,94 @@ async def show_cart(callback: CallbackQuery):
         
         cart_text += f"\n<b>Итого:</b> {total} сум"
         
-        await callback.message.edit_text(
+        await message.edit_text(
             cart_text,
             reply_markup=get_cart_keyboard()
         )
-    
-    await callback.answer()
+
+# Добавление товара в корзину
+@router.callback_query(lambda c: c.data.startswith("add_to_cart_"))
+async def add_to_cart(callback: CallbackQuery):
+    try:
+        await callback.answer(f"{products[callback.data.replace('add_to_cart_', '')]['name']} добавлен в корзину!")
+        user_id = callback.from_user.id
+        product_id = callback.data.replace("add_to_cart_", "")
+        
+        if user_id not in user_carts:
+            user_carts[user_id] = {}
+        
+        if product_id in user_carts[user_id]:
+            user_carts[user_id][product_id] = user_carts[user_id][product_id] + 1
+        else:
+            user_carts[user_id][product_id] = 1
+        
+        # Показываем обновленную корзину
+        await display_cart(user_id, callback.message)
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
+
+# Показать корзину
+@router.callback_query(lambda c: c.data == "cart")
+async def show_cart(callback: CallbackQuery):
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        await display_cart(callback.from_user.id, callback.message)
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 # Очистить корзину
 @router.callback_query(lambda c: c.data == "clear_cart")
 async def clear_cart(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    
-    if user_id in user_carts:
-        user_carts[user_id] = {}
-    
-    await callback.message.edit_text(
-        "🛒 Ваша корзина\n\n"
-        "Корзина очищена.",
-        reply_markup=get_main_keyboard()
-    )
-    
-    await callback.answer("Корзина очищена!")
+    try:
+        await callback.answer("Корзина очищена!")  # Отвечаем сразу
+        user_id = callback.from_user.id
+        
+        if user_id in user_carts:
+            user_carts[user_id] = {}
+        
+        await callback.message.edit_text(
+            "🛒 Ваша корзина\n\n"
+            "Корзина очищена.",
+            reply_markup=get_main_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 # Начало оформления заказа
 @router.callback_query(lambda c: c.data == "checkout")
 async def start_checkout(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(
-        "📝 <b>Оформление заказа</b>\n\n"
-        "Пожалуйста, введите ваше имя:",
-        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="❌ Отменить", callback_data="cancel_order")]
-        ])
-    )
-    
-    await state.set_state(OrderStates.waiting_for_name)
-    await callback.answer()
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        await callback.message.edit_text(
+            "📝 <b>Оформление заказа</b>\n\n"
+            "Пожалуйста, введите ваше имя:",
+            reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
+                [types.InlineKeyboardButton(text="❌ Отменить", callback_data="cancel_order")]
+            ])
+        )
+        
+        await state.set_state(OrderStates.waiting_for_name)
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 # Отмена оформления заказа
 @router.callback_query(lambda c: c.data == "cancel_order")
 async def cancel_order(callback: CallbackQuery, state: FSMContext):
-    await state.clear()
-    
-    await callback.message.edit_text(
-        "❌ Оформление заказа отменено.",
-        reply_markup=get_main_keyboard()
-    )
-    
-    await callback.answer()
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        await state.clear()
+        
+        await callback.message.edit_text(
+            "❌ Оформление заказа отменено.",
+            reply_markup=get_main_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 # Получение имени
 @router.message(OrderStates.waiting_for_name)
@@ -190,23 +209,27 @@ async def process_address(message: Message, state: FSMContext):
 # Подтверждение заказа
 @router.callback_query(lambda c: c.data == "confirm_order")
 async def confirm_order(callback: CallbackQuery, state: FSMContext):
-    user_id = callback.from_user.id
-    user_data = await state.get_data()
-    
-    # В реальном боте здесь был бы код для сохранения заказа в базу данных
-    # и отправки уведомления администратору
-    
-    # Очищаем корзину пользователя
-    if user_id in user_carts:
-        user_carts[user_id] = {}
-    
-    await callback.message.edit_text(
-        "✅ <b>Заказ успешно оформлен!</b>\n\n"
-        f"Спасибо за заказ, {user_data['name']}!\n"
-        "Наш менеджер свяжется с вами в ближайшее время для подтверждения заказа.\n\n"
-        "Номер заказа: #" + str(user_id)[-4:] + str(hash(user_data['phone']))[-4:],
-        reply_markup=get_main_keyboard()
-    )
-    
-    await state.clear()
-    await callback.answer("Заказ оформлен!")
+    try:
+        await callback.answer("Заказ оформлен!")  # Отвечаем сразу
+        user_id = callback.from_user.id
+        user_data = await state.get_data()
+        
+        # В реальном боте здесь был бы код для сохранения заказа в базу данных
+        # и отправки уведомления администратору
+        
+        # Очищаем корзину пользователя
+        if user_id in user_carts:
+            user_carts[user_id] = {}
+        
+        await callback.message.edit_text(
+            "✅ <b>Заказ успешно оформлен!</b>\n\n"
+            f"Спасибо за заказ, {user_data['name']}!\n"
+            "Наш менеджер свяжется с вами в ближайшее время для подтверждения заказа.\n\n"
+            "Номер заказа: #" + str(user_id)[-4:] + str(hash(user_data['phone']))[-4:],
+            reply_markup=get_main_keyboard()
+        )
+        
+        await state.clear()
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass

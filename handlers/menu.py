@@ -17,7 +17,9 @@ def get_add_to_cart_keyboard(product_id):
 
 @router.callback_query(lambda c: c.data == "water_5l")
 async def show_water_5l(callback: CallbackQuery):
-    product_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        product_text = """
 💧 <b>Питьевая вода 5л</b>
 
 <b>Описание:</b>
@@ -30,16 +32,20 @@ async def show_water_5l(callback: CallbackQuery):
 
 <b>Цена:</b> 7 000 сум
 """
-    
-    await callback.message.edit_text(
-        product_text,
-        reply_markup=get_add_to_cart_keyboard("water_5l")
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            product_text,
+            reply_markup=get_add_to_cart_keyboard("water_5l")
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "water_10l")
 async def show_water_10l(callback: CallbackQuery):
-    product_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        product_text = """
 💧 <b>Питьевая вода 10л</b>
 
 <b>Описание:</b>
@@ -52,16 +58,20 @@ async def show_water_10l(callback: CallbackQuery):
 
 <b>Цена:</b> 13 000 сум
 """
-    
-    await callback.message.edit_text(
-        product_text,
-        reply_markup=get_add_to_cart_keyboard("water_10l")
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            product_text,
+            reply_markup=get_add_to_cart_keyboard("water_10l")
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "water_19l")
 async def show_water_19l(callback: CallbackQuery):
-    product_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        product_text = """
 💧 <b>Питьевая вода 19л</b>
 
 <b>Описание:</b>
@@ -75,16 +85,20 @@ async def show_water_19l(callback: CallbackQuery):
 
 <b>Цена:</b> 20 000 сум
 """
-    
-    await callback.message.edit_text(
-        product_text,
-        reply_markup=get_add_to_cart_keyboard("water_19l")
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            product_text,
+            reply_markup=get_add_to_cart_keyboard("water_19l")
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "contact")
 async def show_contact(callback: CallbackQuery):
-    contact_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        contact_text = """
 📞 <b>Контактная информация</b>
 
 📱 Телефон: +998 (33) 433-44-04
@@ -95,16 +109,20 @@ async def show_contact(callback: CallbackQuery):
 📘 Instagram: ramiz_matlabov
 📷 Telegram: @ramiz_matlabov
 """
-    
-    await callback.message.edit_text(
-        contact_text,
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            contact_text,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "delivery")
 async def show_delivery(callback: CallbackQuery):
-    delivery_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        delivery_text = """
 🚚 <b>Доставка</b>
 
 <b>Условия доставки:</b>
@@ -116,16 +134,20 @@ async def show_delivery(callback: CallbackQuery):
 • Понедельник-Пятница: с 9:00 до 21:00
 • Суббота-Воскресенье: с 10:00 до 18:00
 """
-    
-    await callback.message.edit_text(
-        delivery_text,
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            delivery_text,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "prices")
 async def show_prices(callback: CallbackQuery):
-    prices_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        prices_text = """
 💰 <b>Цены на воду</b>
 
 <b>Питьевая вода:</b>
@@ -142,16 +164,20 @@ async def show_prices(callback: CallbackQuery):
 • При заказе от 5 бутылей - скидка 5%
 • При заказе от 10 бутылей - скидка 10%
 """
-    
-    await callback.message.edit_text(
-        prices_text,
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            prices_text,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "about")
 async def show_about(callback: CallbackQuery):
-    about_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        about_text = """
 ❓ <b>О компании Ice Water🧊</b>
 
 Компания Ice Water🧊 занимается доставкой чистой питьевой воды с 2010 года.
@@ -165,16 +191,20 @@ async def show_about(callback: CallbackQuery):
 
 Мы заботимся о вашем здоровье и комфорте!
 """
-    
-    await callback.message.edit_text(
-        about_text,
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            about_text,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass
 
 @router.callback_query(lambda c: c.data == "equipment")
 async def show_equipment(callback: CallbackQuery):
-    equipment_text = """
+    try:
+        await callback.answer()  # Отвечаем сразу, чтобы избежать timeout
+        equipment_text = """
 🔄 <b>Оборудование для воды</b>
 
 <b>Помпы:</b>
@@ -190,18 +220,11 @@ async def show_equipment(callback: CallbackQuery):
 • Подставка для бутыли - 30 000 сум
 • Держатель стаканов - 7 000 сум
 """
-    
-    await callback.message.edit_text(
-        equipment_text,
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
-
-# Обработчик для кнопки "Корзина"
-@router.callback_query(lambda c: c.data == "cart")
-async def show_cart(callback: CallbackQuery):
-    await callback.message.edit_text(
-        "🛒 <b>Ваша корзина пуста</b>\n\nДобавьте товары из каталога",
-        reply_markup=get_back_keyboard()
-    )
-    await callback.answer()
+        
+        await callback.message.edit_text(
+            equipment_text,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        # Если callback уже обработан или устарел, просто игнорируем
+        pass

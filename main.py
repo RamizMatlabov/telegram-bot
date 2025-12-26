@@ -123,7 +123,18 @@ async def main():
         logger.info(f"Starting webhook server on {APP_HOST}:{APP_PORT}")
         logger.info(f"Webhook URL will be: {get_webhook_base_url()}{WEBHOOK_PATH}")
         try:
-            web.run_app(app, host=APP_HOST, port=APP_PORT)
+            runner = web.AppRunner(app)
+            await runner.setup()
+            site = web.TCPSite(runner, APP_HOST, APP_PORT)
+            await site.start()
+            logger.info(f"Webhook server started successfully on {APP_HOST}:{APP_PORT}")
+            # Держим сервер запущенным
+            try:
+                await asyncio.Future()  # Бесконечное ожидание
+            except asyncio.CancelledError:
+                logger.info("Server shutdown requested")
+            finally:
+                await runner.cleanup()
         except Exception as e:
             logger.error(f"Error starting webhook: {e}")
             raise
