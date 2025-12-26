@@ -10,6 +10,10 @@ services:
       - key: ADMIN_ID
         sync: false
       - key: WEBHOOK_MODE
-        value: true
+        value: "true"
       - key: WEBHOOK_PATH
         value: /webhook
+      - key: APP_HOST
+        value: 0.0.0.0
+      - key: DELETE_WEBHOOK_ON_STARTUP
+        value: "false"

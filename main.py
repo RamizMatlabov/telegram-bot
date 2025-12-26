@@ -47,8 +47,9 @@ async def delete_webhook(bot: Bot) -> None:
 
 async def on_startup(bot: Bot) -> None:
     """Настройка вебхука при запуске"""
-    # Сначала удаляем вебхук, если это требуется
-    if DELETE_WEBHOOK_ON_STARTUP:
+    # В режиме polling всегда удаляем вебхук, чтобы бот мог получать обновления
+    # В режиме webhook удаляем только если установлен флаг DELETE_WEBHOOK_ON_STARTUP
+    if not WEBHOOK_MODE or DELETE_WEBHOOK_ON_STARTUP:
         await delete_webhook(bot)
     
     # Затем устанавливаем новый вебхук, если нужно
