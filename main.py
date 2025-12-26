@@ -20,12 +20,29 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # Определяем режим работы (webhook или polling)
-WEBHOOK_MODE = os.getenv('WEBHOOK_MODE', 'False').lower() == 'true'
+# Если мы на Render (определяется по RENDER_EXTERNAL_URL), автоматически включаем webhook
+IS_RENDER = bool(os.getenv('RENDER_EXTERNAL_URL'))
+WEBHOOK_MODE_ENV = os.getenv('WEBHOOK_MODE', 'False')
+# На Render всегда используем webhook режим, если не указано иное
+if IS_RENDER and WEBHOOK_MODE_ENV.lower() not in ('false', '0', 'no'):
+    WEBHOOK_MODE = True
+    logger.info("Detected Render environment, enabling webhook mode")
+else:
+    WEBHOOK_MODE = WEBHOOK_MODE_ENV.lower() in ('true', '1', 'yes')
+
 WEBHOOK_URL = os.getenv('WEBHOOK_URL', '')
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH', '/webhook')
 APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
-APP_PORT = int(os.getenv('PORT', 10000))  # Render.com expects port 10000 by default
-DELETE_WEBHOOK_ON_STARTUP = os.getenv('DELETE_WEBHOOK_ON_STARTUP', 'False').lower() == 'true'
+# Render автоматически устанавливает PORT, используем его или дефолтный 10000
+APP_PORT = int(os.getenv('PORT', os.getenv('RENDER_PORT', '10000')))
+DELETE_WEBHOOK_ON_STARTUP = os.getenv('DELETE_WEBHOOK_ON_STARTUP', 'False').lower() in ('true', '1', 'yes')
+
+# Логируем настройки для отладки
+logger.info(f"IS_RENDER: {IS_RENDER}")
+logger.info(f"WEBHOOK_MODE env value: {WEBHOOK_MODE_ENV}, final: {WEBHOOK_MODE}")
+logger.info(f"APP_HOST: {APP_HOST}, APP_PORT: {APP_PORT}")
+logger.info(f"WEBHOOK_PATH: {WEBHOOK_PATH}")
+logger.info(f"RENDER_EXTERNAL_URL: {os.getenv('RENDER_EXTERNAL_URL', 'not set')}")
 
 def get_webhook_base_url() -> str:
     webhook_url = (WEBHOOK_URL or "").strip()
@@ -87,6 +104,11 @@ async def main():
         # Настройка веб-сервера для вебхука
         app = web.Application()
         
+        # Add health check route FIRST (before webhook handler)
+        async def health_check(request):
+            return web.Response(text="Bot is running!")
+        app.router.add_get("/", health_check)
+        
         # Настройка обработчика вебхуков
         webhook_requests_handler = SimpleRequestHandler(
             dispatcher=dp,
@@ -98,16 +120,13 @@ async def main():
         setup_application(app, dp, bot=bot)
         
         # Запуск веб-сервера
-        logger.info(f"Starting webhook on {APP_HOST}:{APP_PORT}")
+        logger.info(f"Starting webhook server on {APP_HOST}:{APP_PORT}")
+        logger.info(f"Webhook URL will be: {get_webhook_base_url()}{WEBHOOK_PATH}")
         try:
-            # Add a simple health check route that Render can use to detect the port
-            async def health_check(request):
-                return web.Response(text="Bot is running!")
-            
-            app.router.add_get("/", health_check)
             web.run_app(app, host=APP_HOST, port=APP_PORT)
         except Exception as e:
             logger.error(f"Error starting webhook: {e}")
+            raise
     else:
         # Запуск в режиме polling
         logger.info("Starting bot in polling mode...")
